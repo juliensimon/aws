@@ -1,0 +1,48 @@
+#!/bin/bash
+
+# Author: Julien Simon <julien@julien.org>
+
+# ECS tool in the spirit of ecs-cli :)
+# default cluster should be configured : ecs-cli configure
+
+if [ -z $1 ]
+then
+	echo "ecs-find services : list services running on the current cluster"
+	echo "ecs-find ips : list IP addresses of ECS instances"
+	echo "ecs-find service SERVICE_NAME : list IP addresses of ECS instances running a service"
+	echo "ecs-find ip IP_ADDRESS : list services running on an ECS instance"
+	echo "ecs-find container SERVICE_NAME IP_ADDRESS : list container ids for a service on a ECS instance"
+	echo "ecs-find log CONTAINER_ID IP_ADDRESS : tail log of a container running on an ECS instance"
+ else
+	case "$1" in
+
+	# List service names
+	services) ecs-cli ps | grep -v Name | awk '{print $4}' | cut -d : -f 1 | sort | uniq
+	;;
+
+	# List IP addresses of ECS instances
+	ips) ecs-cli ps | grep -v Name | awk '{print $3}' | cut -d : -f 1 | sort | uniq
+	;;
+	
+	# List IP addresses of ECS instances running a service
+	service) ecs-cli ps | grep $2 | awk '{print $3}' | cut -d : -f 1 | sort | uniq
+	;;
+
+	# List services running on a ECS instance
+	ip) ecs-cli ps | grep $2 | awk '{print $4}' | cut -d : -f 1 | sort | uniq
+	;;
+
+	# List container ids for a given service a given ECS instance
+	container) ssh ec2-user@$3 docker ps |grep $2 | awk '{print $1}'
+	;;
+
+	# Tail log for a given container id on a given ECS instance
+	log) ssh ec2-user@$3 docker logs -f $2
+	;;
+
+	*)	 echo "meh"
+		;;
+	esac
+fi
+
+
