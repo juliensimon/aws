@@ -1,0 +1,90 @@
+
+$ aws iam list-attached-role-policies --role MLClient
+{
+    "AttachedPolicies": [
+        {
+            "PolicyName": "AmazonMachineLearningReadOnlyAccess",
+            "PolicyArn": "arn:aws:iam::aws:policy/AmazonMachineLearningReadOnlyAccess"
+        },
+        {
+            "PolicyName": "AmazonMachineLearningRealTimePredictionOnlyAccess",
+            "PolicyArn": "arn:aws:iam::aws:policy/AmazonMachineLearningRealTimePredictionOnlyAccess"
+        }
+    ]
+}
+
+$ aws iam get-policy --policy-arn arn:aws:iam::aws:policy/AmazonMachineLearningRealTimePredictionOnlyAccess
+{
+    "Policy": {
+        "PolicyName": "AmazonMachineLearningRealTimePredictionOnlyAccess",
+        "Description": "Grants users permission to request Amazon Machine Learning real-time predictions.",
+        "CreateDate": "2015-04-09T17:44:06Z",
+        "AttachmentCount": 1,
+        "IsAttachable": true,
+        "PolicyId": "ANPAIWMCNQPRWMWT36GVQ",
+        "DefaultVersionId": "v1",
+        "Path": "/",
+        "Arn": "arn:aws:iam::aws:policy/AmazonMachineLearningRealTimePredictionOnlyAccess",
+        "UpdateDate": "2015-04-09T17:44:06Z"
+    }
+}
+
+$ aws iam get-policy-version --policy-arn arn:aws:iam::aws:policy/AmazonMachineLearningRealTimePredictionOnlyAccess --version-id v1
+"PolicyVersion": {
+        "CreateDate": "2015-04-09T17:44:06Z",
+        "VersionId": "v1",
+        "Document": {
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Action": [
+                        "machinelearning:Predict"
+                    ],
+                    "Resource": "*",
+                    "Effect": "Allow"
+                }
+            ]
+        },
+        "IsDefaultVersion": true
+    }
+
+$ aws iam get-policy --policy-arn arn:aws:iam::aws:policy/AmazonMachineLearningReadOnlyAccess
+{
+    "Policy": {
+        "PolicyName": "AmazonMachineLearningReadOnlyAccess",
+        "Description": "Provides read only access to Amazon Machine Learning resources.",
+        "CreateDate": "2015-04-09T17:40:02Z",
+        "AttachmentCount": 1,
+        "IsAttachable": true,
+        "PolicyId": "ANPAIW5VYBCGEX56JCINC",
+        "DefaultVersionId": "v1",
+        "Path": "/",
+        "Arn": "arn:aws:iam::aws:policy/AmazonMachineLearningReadOnlyAccess",
+        "UpdateDate": "2015-04-09T17:40:02Z"
+    }
+}
+
+$ aws iam get-policy-version --policy-arn arn:aws:iam::aws:policy/AmazonMachineLearningReadOnlyAccess --version-id v1
+{
+    "PolicyVersion": {
+        "CreateDate": "2015-04-09T17:40:02Z",
+        "VersionId": "v1",
+        "Document": {
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Action": [
+                        "machinelearning:Describe*",
+                        "machinelearning:Get*"
+                    ],
+                    "Resource": "*",
+                    "Effect": "Allow"
+                }
+            ]
+        },
+        "IsDefaultVersion": true
+    }
+}
+
+
+
