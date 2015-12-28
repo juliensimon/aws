@@ -52,7 +52,7 @@ public class MLSample {
 		DescribeMLModelsResult models = client.describeMLModels();
 		MLModel model = null;
 
-		// Show basic information about each model
+		// Show basic information about the model
 		for (MLModel m : models.getResults()) {
 			if (m.getMLModelId().equals(args[1])) {
 				model = m;
@@ -67,6 +67,7 @@ public class MLSample {
 				System.out.println("URL: " + endpoint.getEndpointUrl());
 				System.out.println("Status: " + endpoint.getEndpointStatus());
 				System.out.println("RPS: " + endpoint.getPeakRequestsPerSecond());
+				break;
 			}
 		}
 
