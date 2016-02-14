@@ -1,0 +1,34 @@
+body
+{
+    padding-top: 60px;
+    padding-bottom: 40px;
+}
+
+.boxed-message
+{
+    padding:0.5em 1.5em;
+    border-style:none;
+    border-radius:1.0em;
+    background-color: rgba(32, 32, 32, 0.75);
+}
+
+.hero-unit 
+{
+    background-color: #d0d0d0;
+    background-repeat: no-repeat;
+    background-position: top;
+    background-size: cover;
+}
+
+.hero-unit p, .hero-unit h2, .hero-unit h1
+{
+    color: White;
+}
+
+.thumbnail p
+{
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 16px;
+    line-height: 22px;
+    text-align:justify;
+}

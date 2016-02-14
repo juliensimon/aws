@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+  <meta name="keywords" content="">
+
+  <title>Pre-Launch Signup</title>
+
+  <%= stylesheet_link_tag    "application", :media => "all" %>
+  <%= javascript_include_tag "application" %>
+  <%= csrf_meta_tags %>
+
+  <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+  <!--[if lt IE 9]>
+    <script src="../assets/js/html5shiv.js"></script>
+  <![endif]-->
+
+  <!-- Fav and touch icons -->
+  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="#">
+  <link rel="apple-touch-icon-precomposed" sizes="114x114" href="#">
+  <link rel="apple-touch-icon-precomposed" sizes="72x72" href="#">
+  <link rel="apple-touch-icon-precomposed" href="#">
+  <link rel="shortcut icon" href="#">
+</head>
+<body>
+<%= render "layouts/menu" %>
+
+<div class="container">
+  <%= yield %>
+  <%= render "layouts/footer" %>
+</div>
+</body>
+</html>

@@ -1,0 +1,51 @@
+<%= render "layouts/menu" %>
+
+<div class="container">
+  <!-- Main hero unit for a primary marketing message or call to action -->
+  <div class="hero-unit" style="background-image: url(/assets/seattleSkyline.jpg);">
+      <div class="boxed-message">
+          <h2>About Us</h2>
+          <p>
+	      Talk about yourself and why this is important
+	  </p>
+      </div>
+  </div>
+  <div class="container">
+      <h1>Our Team</h1>
+      <ul class="thumbnails">
+          <li class="span4">
+              <div class="thumbnail">
+                  <img src="#" alt="#1's Image"/>
+                  <h3 style="font-size:16px">Member #1</h3>
+                  <p style="font-size:12px">
+                      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed quis leo non leo
+                      sollicitudin viverra a lacinia leo. Sed dolor metus, hendrerit ac iaculis at,
+                      venenatis nec purus. Mauris mauris.
+                   </p>
+              </div>
+          </li>
+          <li class="span4">
+              <div class="thumbnail">
+                  <img src="#" alt="#2's Image"/>
+                  <h3 style="font-size:16px">Member #2</h3>
+                  <p style="font-size:12px">
+                      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed quis leo non leo
+                      sollicitudin viverra a lacinia leo. Sed dolor metus, hendrerit ac iaculis at,
+                      venenatis nec purus. Mauris mauris.
+                  </p>
+              </div>
+          </li>
+          <li class="span4">
+              <div class="thumbnail">
+                  <img src="#" alt="#3's Image"/>
+                  <h3 style="font-size:16px">Member #3</h3>
+                  <p style="font-size:12px">
+                      Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed quis leo non leo
+                      sollicitudin viverra a lacinia leo. Sed dolor metus, hendrerit ac iaculis at,
+                      venenatis nec purus. Mauris mauris.
+                  </p>
+              </div>
+          </li>
+      </ul>
+  </div>
+
