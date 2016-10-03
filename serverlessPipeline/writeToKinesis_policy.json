@@ -1,0 +1,30 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "lambda:InvokeFunction"
+            ],
+            "Resource": [
+                "*"
+            ]
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "dynamodb:PutItem",
+                "dynamodb:UpdateItem",
+                "kinesis:GetRecords",
+                "kinesis:PutRecord",
+                "kinesis:GetShardIterator",
+                "kinesis:DescribeStream",
+                "kinesis:ListStreams",
+                "logs:CreateLogGroup",
+                "logs:CreateLogStream",
+                "logs:PutLogEvents"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
