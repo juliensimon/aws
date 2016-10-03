@@ -1,8 +1,0 @@
-class HomeController < ApplicationController
-  helper LinkToActive
-  def index
-  end
-
-  def about
-  end
-end
