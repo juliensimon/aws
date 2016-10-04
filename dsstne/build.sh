@@ -1,6 +1,11 @@
 #!/bin/bash
 
+# Download dataset & network config file
+wget https://s3-us-west-2.amazonaws.com/amazon-dsstne-samples/data/ml20m-all
+wget https://s3-us-west-2.amazonaws.com/amazon-dsstne-samples/configs/config.json
+
 # Build DSSTNE
+
 git clone https://github.com/amznlabs/amazon-dsstne.git
 cd amazon-dsstne/src/amazon/dsstne
 
