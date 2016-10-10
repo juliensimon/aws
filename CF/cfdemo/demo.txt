@@ -1,0 +1,35 @@
+
+*** CREATE A GIT REPOSITORY IN CODECOMMIT
+aws codecommit create-repository --repository-name cfdemo --region us-east-1 --repository-description ”CloudFormation demo"
+git clone ssh://git-codecommit.us-east-1.amazonaws.com/v1/repos/cfdemo
+
+*** WORK WITH BASIC TEMPLATES
+aws cloudformation validate-template --template-body file://template1.json
+aws cloudformation validate-template --template-body file://template1broken.json
+aws cloudformation create-stack --template-body file://template1.json --stack-name Template1 --region eu-west-1
+aws cloudformation describe-stacks --stack-name Template1
+aws cloudformation describe-stacks --stack-name myStack --query "Stacks[].StackStatus"
+aws cloudformation describe-stack-events --stack-name Template1
+aws cloudformation get-template --stack-name Template1 --region eu-west-1
+aws cloudformation update-stack --stack-name Template1 --template-body file://template1v2.json --region eu-west-1
+aws cloudformation update-stack --stack-name Template1 --template-body file://template1v3.json --region eu-west-1
+aws cloudformation delete-stack --stack-name Template1 --region eu-west-1
+
+*** TEMPLATE WITH PARAMETERS AND OUTPUTS
+aws cloudformation validate-template --template-body file://template2.json
+aws cloudformation create-stack --template-body file://template2.json --stack-name Template2 --region eu-west-1
+aws cloudformation create-stack --template-body file://template2.json --stack-name Template2 --region sa-east-1
+aws cloudformation delete-stack --stack-name Template2 --region eu-west-1
+
+*** VPC
+aws cloudformation validate-template --template-body file://vpc1.json
+aws cloudformation create-stack --template-body file://vpc1.json --stack-name VPC1 --region eu-west-1
+aws cloudformation update-stack --stack-name VPC1 --template-body file://vpc2.json --region eu-west-1
+aws cloudformation delete-stack --stack-name VPC1 --region eu-west-1
+
+*** LAMP STACK
+aws cloudformation validate-template --template-body file://lamp.json
+aws cloudformation create-stack --template-body file://lamp.json --stack-name LAMP --region eu-west-1
+aws cloudformation delete-stack --stack-name LAMP --region eu-west-1
+
+
