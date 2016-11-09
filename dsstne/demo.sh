@@ -1,6 +1,7 @@
 #!/bin/bash
 
-export PATH=~/amazon-dsstne/src/amazon/dsstne/bin:$PATH
+export PATH=~/amazon-dsstne/src/amazon/dsstne/bin:/usr/local/openmpi/bin:/usr/local/cuda/bin:$PATH
+export LD_LIBRARY_PATH=/usr/local/cuda-7.0:/usr/local/cuda-7.0/lib64/
 
 # Generate Input layer and Output Layer
 generateNetCDF -d gl_input -i ml20m-all -o gl_input.nc -f features_input -s samples_input -c
