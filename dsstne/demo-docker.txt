@@ -1,0 +1,94 @@
+
+#
+# Locally (as per https://docs.docker.com/machine/overview/)
+#
+
+# Create p2.16xlarge EC2 instance (Ubuntu + latest Docker)
+# More options available to select VPC, etc.
+docker-machine create --driver amazonec2 \
+                      --amazonec2-region us-east-1 \
+                      --amazonec2-zone a \
+                      --amazonec2-instance-type p2.16xlarge \
+                      p216xl01
+
+# Connect to instance
+docker-machine ssh p216xl01
+
+# I recommend blacklisting ’nouveau’ (the Open Source NVIDIA driver) in /etc/modprobe.d/blacklist.conf
+# Not sure if it’s 100% needed, but just in case.
+
+# Add the Ubuntu user to the ‘docker’ group (this saves a lot of sudo’ing when running docker)
+sudo usermod -G docker ubuntu
+
+# Logout / login to apply the group 
+exit
+
+#
+# On the EC2 instance (as per https://github.com/NVIDIA/nvidia-docker/wiki/Deploy-on-Amazon-EC2)
+#
+
+docker-machine ssh p216xl01
+
+# Install dependencies needed to build modules
+sudo apt-get install --no-install-recommends -y gcc make libc-dev linux-headers-`uname -r` linux-headers-generic dkms nvidia-modprobe
+
+# Download the latest NVIDIA driver and nvidia-docker
+wget -P /tmp http://us.download.nvidia.com/XFree86/Linux-x86_64/367.57/NVIDIA-Linux-x86_64-367.57.run
+wget -P /tmp https://github.com/NVIDIA/nvidia-docker/releases/download/v1.0.0-rc.3/nvidia-docker_1.0.0.rc.3-1_amd64.deb
+
+# Install both
+sudo sh /tmp/NVIDIA-Linux-x86_64-367.57.run --silent
+sudo dpkg -i /tmp/nvidia-docker*.deb && rm /tmp/nvidia-docker*.deb
+
+# Test the installation
+service nvidia-docker status
+nvidia-docker run --rm nvidia/cuda nvidia-smi
+
+# Run Tristan’s container, which comes with all dependencies for DSSTNE \m/
+nvidia-docker run -it tristanpenman/dsstne bash
+
+#
+# Inside the container
+#
+
+# Create a ‘user’ user. Always safer, plus mpirun warns about running as root, so let’s not.
+# Add ‘user’ to the ‘sudoers’ group, set ‘password’ as password
+useradd -b /home -m -g 100 -G 27 -u 1001 user -p $(echo "password" | openssl passwd -1 -stdin)
+su - user
+
+# Install git, we need it to clone the DSSTNE source
+sudo apt-get update && sudo apt-get install git -y
+cd
+
+# Clone and build DSSTNE
+git clone https://github.com/amznlabs/amazon-dsstne.git
+cd amazon-dsstne/src/amazon/dsstne/
+export PATH=/usr/local/openmpi/bin:/usr/local/cuda/bin:$PATH
+make
+export PATH=`pwd`/bin:$PATH
+cd
+
+# Get the Movie Lens dataset and the neural network config file
+wget https://s3.amazonaws.com/amazon-dsstne-data/movielens/ml20m-all
+wget https://s3.amazonaws.com/amazon-dsstne-data/movielens/config.json
+
+# Build the input and output layers for training
+generateNetCDF -d gl_input -i ml20m-all -o gl_input.nc -f features_input -s samples_input -c
+generateNetCDF -d gl_output -i ml20m-all -o gl_output.nc -f features_output -s samples_input -c
+
+# Train the model on 8 GPUs
+mpirun -np 8 train -c config.json -i gl_input.nc -o gl_output.nc -n gl.nc -b 256 -e 10
+
+# Predict the dataset
+predict -b 1024 -d gl -i features_input -o features_output -k 10 -n gl.nc -f ml20m-all -s recs -r ml20m-all
+
+# Done!
+exit
+
+#
+# On the instance
+#
+
+# Don’t forget to persist the updated container, unless you want to this all of this again
+docker ps -a
+docker commit CONTAINER_ID dsstne-build
