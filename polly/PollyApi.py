@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
 import os, boto3
 
 defaultRegion = 'us-east-1'
@@ -16,4 +19,8 @@ def speak(polly, text, format='mp3', voice='Brian'):
     os.remove('/tmp/sound.mp3')
 
 polly = connectToPolly()
-speak(polly, "Hello world, I'm Polly. Or Brian. Or anything you want, really.")
+speak(polly, "Hello world, I'm Polly. Or Brian. Or anyone you want, really.")
+frenchString = "Et bien sûr, je parle très bien français, ça vous étonne ?"
+speak(polly, frenchString.decode('utf8'), voice='Mathieu')
+icelandicString = "Gera þú hafa allir hugmynd um hvað ég er að segja? Örugglega ekki !"
+speak(polly, icelandicString.decode('utf8'), voice='Karl')
