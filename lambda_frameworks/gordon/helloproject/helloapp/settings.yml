@@ -1,0 +1,5 @@
+lambdas:
+
+  hellofunc:
+    description: say hello
+    code: hellofunc.py

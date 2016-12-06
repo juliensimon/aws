@@ -1,0 +1,16 @@
+---
+project: helloproject
+default-region: us-east-1
+code-bucket: gordon-helloproject-69dad89d
+apps:
+  - gordon.contrib.lambdas
+  - helloapp
+
+apigateway:
+    helloapi:
+        description: say hello
+        resources:
+            /:
+                methods: POST
+                integration:
+                    lambda: helloapp.hellofunc

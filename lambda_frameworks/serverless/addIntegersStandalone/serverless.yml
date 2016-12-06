@@ -1,0 +1,9 @@
+service: addIntegersStandalone
+
+provider:
+  name: aws
+  runtime: python2.7
+
+functions:
+  add:
+    handler: handler.add
