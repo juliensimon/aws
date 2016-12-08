@@ -10,6 +10,8 @@ import rekognitionUtils as utils
 import rekognitionApi as api
 import awsUtils
 
+import PollyApi
+
 def usage():
     print('\nrekognitionDetect <S3BucketName> <image> [copy|nocopy]\n')
     print('S3BucketName  : the S3 bucket where Rekognition will find the image')
@@ -32,7 +34,9 @@ if (str(sys.argv[3]) == 'copy'):
 imageInfo   = utils.openLocalImage(image)
 
 reko = api.connectToRekognitionService()
-labels = api.detectLabels(reko, imageBucket, image, maxLabels=10, minConfidence=75.0)
+polly = PollyApi.connectToPolly()
+
+labels = api.detectLabels(reko, imageBucket, image, maxLabels=10, minConfidence=70.0)
 utils.printLabelsInformation(labels)
 
 faceList = api.detectFaces(reko, imageBucket, image)
@@ -43,3 +47,20 @@ for face in faceList:
     utils.drawLegendForFace(imageInfo, face, faceCounter)
     faceCounter=faceCounter+1
 utils.saveImage(image, imageInfo)
+
+if (faceCounter == 0):
+    message = "No face has been detected, sorry"
+else:
+    if (faceCounter == 1):
+        message = "A single face has been detected"
+    else:
+        message = str(faceCounter)+ " faces have been detected"
+
+labelText = ''
+for l in labels:
+    if (l['Confidence'] > 80.0):
+        labelText = labelText + l['Name'] + ", "
+
+PollyApi.speak(polly, message)
+if (labelText != ''):
+    PollyApi.speak(polly, "Here are some keywords about this picture: " + labelText)
