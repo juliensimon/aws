@@ -5,8 +5,8 @@
 
 import boto3
 
-defaultRegion = 'us-east-1'
-defaultUrl = 'https://rekognition.us-east-1.amazonaws.com'
+defaultRegion = 'eu-west-1'
+defaultUrl = 'https://rekognition.eu-west-1.amazonaws.com'
 
 def connectToRekognitionService(regionName=defaultRegion, endpointUrl=defaultUrl):
     return boto3.client('rekognition', region_name=regionName, endpoint_url=endpointUrl)
