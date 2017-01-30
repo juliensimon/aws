@@ -1,0 +1,33 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Resources:
+
+    MyLambdaFunction:
+        Type: AWS::Serverless::Function
+        Properties:
+           Handler: lambda2.lambda_handler
+           Description: Add 2 integers and stores the result in DynamoDB
+           Runtime: python2.7
+           MemorySize: 128
+           Timeout: 1
+           Policies: AmazonDynamoDBFullAccess
+           CodeUri: s3://jsimon-public/lambda2.zip
+           Environment:
+               Variables:
+                 TABLE_NAME: !Ref MyDynamoDbTable
+           Events:
+                MyPostApi:
+                 Type: Api
+                 Properties:
+                   Path: /add
+                   Method: post
+
+    MyDynamoDbTable:
+         Type: AWS::Serverless::SimpleTable
+         Properties:
+           PrimaryKey:
+             Name: id
+             Type: String
+           ProvisionedThroughput:
+             ReadCapacityUnits: 5
+             WriteCapacityUnits: 5
