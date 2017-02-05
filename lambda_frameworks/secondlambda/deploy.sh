@@ -10,6 +10,6 @@ aws cloudformation package \
    --s3-bucket jsimon-public
 
 aws cloudformation deploy \
---template-file /Users/julsimon/dev/aws/lambda_frameworks/secondlambda/serverless-output.yml \
+--template-file serverless-output.yml \
 --capabilities CAPABILITY_IAM \
 --stack-name lambda2WithSam
