@@ -1,0 +1,17 @@
+CREATE EXTERNAL TABLE IF NOT EXISTS athenatest.sales (
+  lastname string,
+  firstname string,
+  gender string,
+  state string,
+  age int,
+  day int,
+  hour int,
+  minutes int,
+  items int,
+  basket int 
+)
+ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe'
+WITH SERDEPROPERTIES (
+  'serialization.format' = ',',
+  'field.delim' = ','
+) LOCATION 's3://jsimon-redshift-demo-us/data/';
