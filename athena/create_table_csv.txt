@@ -1,4 +1,4 @@
-CREATE EXTERNAL TABLE IF NOT EXISTS athenatest.sales (
+CREATE EXTERNAL TABLE IF NOT EXISTS salescsv (
   lastname string,
   firstname string,
   gender string,

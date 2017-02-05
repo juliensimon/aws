@@ -1,4 +1,4 @@
-CREATE EXTERNAL TABLE salescsv (
+CREATE EXTERNAL TABLE salescsv(
   lastname string,
   firstname string,
   gender string,
@@ -31,7 +31,8 @@ items int,
 basket int
 )
 STORED AS PARQUET
-LOCATION 's3://jsimon-redshift-demo-us/dataparquet/';
+LOCATION 's3://jsimon-redshift-demo-us/dataparquet/'
+TBLPROPERTIES ("parquet.compress"="SNAPPY");
 
 INSERT OVERWRITE TABLE salesparquet
 SELECT lastname,firstname,gender,state,age,day,hour,minutes,items,basket
@@ -50,7 +51,8 @@ items int,
 basket int
 )
 STORED AS ORC
-LOCATION 's3://jsimon-redshift-demo-us/dataorc/';
+LOCATION 's3://jsimon-redshift-demo-us/dataorc/'
+TBLPROPERTIES ("orc.compress"="SNAPPY");
 
 INSERT OVERWRITE TABLE salesorc
 SELECT lastname,firstname,gender,state,age,day,hour,minutes,items,basket

@@ -1,4 +1,4 @@
-CREATE EXTERNAL TABLE IF NOT EXISTS athenatest.salesparquet (
+CREATE EXTERNAL TABLE IF NOT EXISTS salesparquet (
   `lastname` string,
   `firstname` string,
   `gender` string,
@@ -13,4 +13,6 @@ CREATE EXTERNAL TABLE IF NOT EXISTS athenatest.salesparquet (
 ROW FORMAT SERDE 'org.apache.hadoop.hive.ql.io.parquet.serde.ParquetHiveSerDe'
 WITH SERDEPROPERTIES (
   'serialization.format' = '1'
-) LOCATION 's3://jsimon-redshift-demo-us/dataparquet/';
+)
+LOCATION 's3://jsimon-redshift-demo-us/dataparquet/'
+TBLPROPERTIES ("parquet.compress"="SNAPPY");
