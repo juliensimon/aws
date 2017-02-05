@@ -31,7 +31,7 @@ items int,
 basket int
 )
 STORED AS PARQUET
-LOCATION 's3://jsimon-redshift-demo-us/data/parquet/';
+LOCATION 's3://jsimon-redshift-demo-us/dataparquet/';
 
 INSERT OVERWRITE TABLE salesparquet
 SELECT lastname,firstname,gender,state,age,day,hour,minutes,items,basket
@@ -50,7 +50,7 @@ items int,
 basket int
 )
 STORED AS ORC
-LOCATION 's3://jsimon-redshift-demo-us/data/orc/';
+LOCATION 's3://jsimon-redshift-demo-us/dataorc/';
 
 INSERT OVERWRITE TABLE salesorc
 SELECT lastname,firstname,gender,state,age,day,hour,minutes,items,basket
