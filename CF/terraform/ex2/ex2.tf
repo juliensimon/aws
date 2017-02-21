@@ -7,7 +7,7 @@ resource "aws_instance" "mySecondTerraformInstance" {
   key_name		= "admin"
   security_groups 	= [ "PingSG" ]		# ICMP and SSH allowed
   tags {
-	Name = "Terraform1"
+	Name = "Terraform2"
     }
 }
 
