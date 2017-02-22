@@ -1,6 +1,6 @@
 
 *** CREATE A GIT REPOSITORY IN CODECOMMIT
-aws codecommit create-repository --repository-name cfdemo --region us-east-1 --repository-description ”CloudFormation demo"
+aws codecommit create-repository --repository-name cfdemo --region us-east-1 --repository-description "CloudFormation demo"
 git clone ssh://git-codecommit.us-east-1.amazonaws.com/v1/repos/cfdemo
 
 *** WORK WITH BASIC TEMPLATES
