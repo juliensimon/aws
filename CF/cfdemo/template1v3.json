@@ -1,37 +1,41 @@
 {
     "AWSTemplateFormatVersion": "2010-09-09",
+
     "Description": "Template to launch an Amazon Linux instance.",
+
     "Mappings": {
         "RegionMap": {
             "ap-northeast-1": {
-                "AMI": "ami-39b23d38"
+                "AMI": "ami-56d4ad31"
             },
             "ap-southeast-1": {
-                "AMI": "ami-fade91a8"
+                "AMI": "ami-dc9339bf"
             },
             "ap-southeast-2": {
-                "AMI": "ami-d16bfbeb"
+                "AMI": "ami-1c47407f"
             },
             "eu-west-1": {
-                "AMI": "ami-c7c0d6b3"
+                "AMI": "ami-70edb016"
             },
             "sa-east-1": {
-                "AMI": "ami-5253894f"
+                "AMI": "ami-80086dec"
             },
             "us-east-1": {
-                "AMI": "ami-05355a6c"
+                "AMI": "ami-0b33d91d"
             },
             "us-west-1": {
-                "AMI": "ami-3ffed17a"
+                "AMI": "ami-165a0876"
             },
             "us-west-2": {
-                "AMI": "ami-0358ce33"
+                "AMI": "ami-f173cc91"
             }
         }
     },
+
     "Resources": {
         "Ec2Instance1": {
-            "Properties": {
+          "Type": "AWS::EC2::Instance",
+          "Properties": {
                 "ImageId": {
                     "Fn::FindInMap": [
                         "RegionMap",
@@ -41,24 +45,50 @@
                         "AMI"
                     ]
                 },
-                "InstanceType": "m1.large"
-            },
-            "Type": "AWS::EC2::Instance"
+                "InstanceType": "t2.micro",
+		"KeyName": "admin",
+		"SecurityGroups": [ { "Ref" : "WebSecurityGroup" } ],
+		"Tags": [
+			{"Key":"Name", "Value":"CFInstance1"}
+		]
+          }
         },
-        "Ec2Instance2": {
-            "Properties": {
-                "ImageId": {
-                    "Fn::FindInMap": [
-                        "RegionMap",
-                        {
-                            "Ref": "AWS::Region"
-                        },
-                        "AMI"
-                    ]
+    
+	"WebSecurityGroup": {
+	  "Properties": {
+		"GroupDescription": "Enable TCP access for Web and SSH traffic from outside",
+		"SecurityGroupIngress": [
+                {
+                    "CidrIp": "0.0.0.0/0",
+                    "FromPort": "80",
+                    "IpProtocol": "tcp",
+                    "ToPort": "80"
                 },
-                "InstanceType": "m1.large"
-            },
-            "Type": "AWS::EC2::Instance"
+                {
+                    "CidrIp": "0.0.0.0/0",
+                    "FromPort": "22",
+                    "IpProtocol": "tcp",
+                    "ToPort": "22"
+                }
+                ]
+	   },
+          "Type": "AWS::EC2::SecurityGroup"
+        }
+    },
+
+    "Outputs" : {
+        "EC2Instance0IpAddress" : {
+                "Description" : "The public IP address of the instance",
+                "Value" : { "Fn::GetAtt" : [ "Ec2Instance1", "PublicIp" ]}
+        },
+        "EC2Instance0DNSName" : {
+                "Description" : "The public DNS name of the instance",
+                "Value" : { "Fn::GetAtt" : [ "Ec2Instance1", "PublicDnsName" ]}
+        },
+        "SecurityGroupId" : {
+                "Description" : "The id of the security group",
+                "Value" : { "Fn::GetAtt" : [ "WebSecurityGroup", "GroupId" ]}
         }
     }
+
 }

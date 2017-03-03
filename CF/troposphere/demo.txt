@@ -1,0 +1,8 @@
+
+python ex1.py > stack.json
+
+aws cloudformation validate-template --template-body file://stack.json
+
+aws cloudformation create-stack --stack-name Tropo1 --template-body file://stack.json \
+	--parameters ParameterKey=SecurityGroup,ParameterValue=PingSG
+

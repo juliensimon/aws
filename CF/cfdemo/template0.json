@@ -1,0 +1,32 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+
+    "Description": "Template to launch an Amazon Linux instance.",
+
+    "Resources": {
+        "Ec2Instance0": {
+          "Type": "AWS::EC2::Instance",
+          "Properties": {
+                "ImageId": "ami-70edb016",
+                "InstanceType": "t2.micro",
+		"KeyName": "admin",
+		"SecurityGroups": [ "PingSG" ],
+		"Tags": [
+			{"Key":"Name", "Value":"CFInstance0"}
+		]
+
+          }
+        }
+
+    },
+    "Outputs" : {
+  	"EC2Instance0IpAddress" : {	
+    		"Description" : "The public IP address of the instance",
+    		"Value" : { "Fn::GetAtt" : [ "Ec2Instance0", "PublicIp" ]}
+	},
+  	"EC2Instance0DNSName" : {	
+    		"Description" : "The public DNS name of the instance",
+    		"Value" : { "Fn::GetAtt" : [ "Ec2Instance0", "PublicDnsName" ]}
+	}
+    }
+}
