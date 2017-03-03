@@ -52,7 +52,7 @@ basket int
 )
 STORED AS ORC
 LOCATION 's3://jsimon-redshift-demo-us/dataorc/'
-TBLPROPERTIES ("orc.compress"="SNAPPY");
+TBLPROPERTIES ("orc.compress"="ZLIB");
 
 INSERT OVERWRITE TABLE salesorc
 SELECT lastname,firstname,gender,state,age,day,hour,minutes,items,basket
