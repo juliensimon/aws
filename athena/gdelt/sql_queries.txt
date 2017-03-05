@@ -77,5 +77,61 @@ FROM (SELECT gdelt.events.eventcode,
   JOIN gdelt.eventcodes ON eventcode = gdelt.eventcodes.code
 ORDER BY nb_events DESC;
 
+-- Count Obama/Putin and Putin/Obama events per category
+SELECT eventcode,
+         gdelt.eventcodes.description,
+         nb_events
+FROM 
+    (SELECT gdelt.eventsparquet.eventcode,
+         COUNT(gdelt.eventsparquet.globaleventid) AS nb_events
+    FROM gdelt.eventsparquet
+    WHERE ((actor1name LIKE '%OBAMA'and actor2name LIKE '%PUTIN')
+            OR (actor2name LIKE '%OBAMA'and actor2name LIKE '%PUTIN'))
+    GROUP BY  gdelt.eventsparquet.eventcode
+    ORDER BY  nb_events DESC)
+JOIN gdelt.eventcodes
+    ON eventcode = gdelt.eventcodes.code
+ORDER BY  nb_events DESC;
 
-select * from gdelt.events where goldsteinscale > 9.0 limit 10;
+-- Same one with WITH
+WITH tmp as (SELECT eventsparquet.eventcode,
+         COUNT(eventsparquet.globaleventid) AS nb_events
+    FROM eventsparquet
+    WHERE ((actor1name LIKE '%OBAMA' and actor2name LIKE '%PUTIN')
+            OR (actor2name LIKE '%OBAMA' and actor1name LIKE '%PUTIN'))
+    GROUP BY  eventsparquet.eventcode
+    ORDER BY  nb_events DESC)
+SELECT eventcode,
+         eventcodes.description,
+         nb_events
+FROM tmp
+JOIN eventcodes
+    ON eventcode = eventcodes.code
+WHERE nb_events >= 50
+ORDER BY  nb_events DESC
+
+-- Same one on HDFS instead of S3
+WITH tmp as (SELECT eventsparquetlocal.eventcode,
+         COUNT(eventsparquetlocal.globaleventid) AS nb_events
+    FROM eventsparquetlocal
+    WHERE ((actor1name LIKE '%OBAMA' and actor2name LIKE '%PUTIN')
+            OR (actor2name LIKE '%OBAMA' and actor1name LIKE '%PUTIN'))
+    GROUP BY  eventsparquetlocal.eventcode
+    ORDER BY  nb_events DESC)
+SELECT eventcode,
+         eventcodes.description,
+         nb_events
+FROM tmp
+JOIN eventcodes
+    ON eventcode = eventcodes.code
+WHERE nb_events >= 50
+ORDER BY  nb_events DESC
+
+Athena (S3 CSV): 19s 
+Athena (S3 Parquet): 5s 
+10 c4.xlarge:
+Hive (S3 Parquet): 76s
+Hive (HDFS Parquet): 44s
+15 c4.xlarge:
+Hive (S3 Parquet): 65s
+Hive (HDFS Parquet): 40s
