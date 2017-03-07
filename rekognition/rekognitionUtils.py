@@ -29,6 +29,8 @@ def drawLinesAroundFace(imageInfo, face, color='orange', width=3):
 def printFaceInformation(face, faceCounter):
     print('*** Face ' + str(faceCounter) + ' detected, confidence: ')+str(face['Confidence'])
     print('Gender: ')+face['Gender']['Value']
+    # You need boto3>=1.4.4 for AgeRange
+    print('Age: ')+str(face['AgeRange']['Low'])+"-"+str(face['AgeRange']['High'])
     if (face['Beard']['Value']):
         print ('Beard')
     if (face['Mustache']['Value']):
