@@ -1,0 +1,16 @@
+---
+project: hellonode
+default-region: ap-southeast-2
+code-bucket: gordon-hellonode-e63e6416
+apps:
+  - gordon.contrib.lambdas
+  - hello
+
+apigateway:
+    helloapi:
+        description: Say Hello
+        resources:
+            /:
+                methods: [GET, POST]
+                integration:
+                    lambda: hello.helloworld

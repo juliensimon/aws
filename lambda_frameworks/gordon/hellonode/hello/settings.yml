@@ -1,0 +1,7 @@
+lambdas:
+  helloworld:
+    code: helloworld
+    handler: code.handler
+    runtime: nodejs4.3
+    description: Say hello
+
