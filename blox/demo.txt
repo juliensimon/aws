@@ -1,0 +1,27 @@
+export REGION_NAME=ap-southeast-1
+
+# Use https://github.com/blox/blox/blob/dev/deploy/aws/conf/cloudformation_template.json
+
+aws cloudformation create-stack --stack-name BloxCluster --template-body file://cloudformation_template.json --region $REGION_NAME
+
+ecs-cli configure --cluster WebCluster --region $REGION_NAME
+
+ecs-cli up --keypair admin --capability-iam --size 3 --instance-type t2.large
+
+./list-task-definitions.py --region $REGION_NAME
+
+# Pick the task definition you want to run on the application cluster
+
+./blox-create-environment.py --environment WebEnvironment --cluster WebCluster --task-definition $TASK_DEF_ARN --stack BloxCluster --apigateway --region $REGION_NAME
+
+./blox-create-deployment.py --environment WebEnvironment --deployment-token $DEP_TOKEN --stack BloxCluster --apigateway --region $REGION_NAME
+
+ecs-cli ps
+
+ecs-cli scale --capability-iam --size 6
+
+ecs-cli ps
+
+ecs-cli down --force
+
+aws cloudformation delete-stack --stack-name BloxCLuster --region $REGION_NAME
