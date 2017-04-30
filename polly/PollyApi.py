@@ -1,22 +1,30 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import os, boto3
+import os, boto3, pygame
 
-defaultRegion = 'us-east-1'
-defaultUrl = 'https://polly.us-east-1.amazonaws.com'
+defaultRegion = 'eu-west-1'
+defaultUrl = 'https://polly.eu-west-1.amazonaws.com'
 
 def connectToPolly(regionName=defaultRegion, endpointUrl=defaultUrl):
     return boto3.client('polly', region_name=regionName, endpoint_url=endpointUrl)
 
-def speak(polly, text, format='mp3', voice='Brian'):
+def play(filename):
+    pygame.init()
+    pygame.mixer.music.load(filename)
+    pygame.mixer.music.play()
+    while pygame.mixer.music.get_busy():
+        pygame.time.Clock().tick(10)
+
+def speak(polly, text, format='ogg_vorbis', voice='Brian'):
+    filename="/tmp/sound"
     resp = polly.synthesize_speech(OutputFormat=format, Text=text, VoiceId=voice)
-    soundfile = open('/tmp/sound.mp3', 'w')
+    soundfile = open(filename, 'w')
     soundBytes = resp['AudioStream'].read()
     soundfile.write(soundBytes)
     soundfile.close()
-    os.system('afplay /tmp/sound.mp3')  # Works only on Mac OS, sorry
-    os.remove('/tmp/sound.mp3')
+    play('/tmp/sound')
+    os.remove(filename)
 
 polly = connectToPolly()
 speak(polly, "Hello world, I'm Polly. Or Brian. Or anyone you want, really.")
