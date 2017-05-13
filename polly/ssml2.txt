@@ -1,0 +1,47 @@
+<speak version="1.0"
+ xmlns="http://www.w3.org/2001/10/synthesis"
+ xml:lang="en-US">
+
+  <prosody pitch="low"> This is low pitch. </prosody>
+
+  <prosody pitch="medium"> This is medium pitch. </prosody>
+
+  <prosody pitch="high"> This is high pitch. </prosody>
+
+  <prosody rate="slow"> This is slow speech. </prosody>
+
+  <prosody rate="1"> This is medium speech. </prosody>
+
+  <prosody rate="fast"> This is fast speech. </prosody>
+
+  <prosody volume="x-soft"> This is extra soft volume. </prosody>
+
+  <prosody volume="medium"> This is medium volume. </prosody>
+
+  <prosody volume="x-loud"> This is extra loud volume. </prosody>
+
+</speak>
+<speak version="1.0"
+ xmlns="http://www.w3.org/2001/10/synthesis"
+ xml:lang="en-US">
+
+  <prosody pitch="low"> This is low pitch. </prosody>
+
+  <prosody pitch="medium"> This is medium pitch. </prosody>
+
+  <prosody pitch="high"> This is high pitch. </prosody>
+
+  <prosody rate="slow"> This is slow speech. </prosody>
+
+  <prosody rate="1"> This is medium speech. </prosody>
+
+  <prosody rate="fast"> This is fast speech. </prosody>
+
+  <prosody volume="x-soft"> This is extra soft volume. </prosody>
+
+  <prosody volume="medium"> This is medium volume. </prosody>
+
+  <prosody volume="x-loud"> This is extra loud volume. </prosody>
+
+</speak>
+

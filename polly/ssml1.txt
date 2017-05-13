@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<speak version="1.0"
+ xmlns="http://www.w3.org/2001/10/synthesis"
+ xml:lang="en-US">
+
+  Your reservation for <say-as interpret-as="cardinal"> 2 </say-as> rooms on
+  the <say-as interpret-as="ordinal"> 4th </say-as> floor of the hotel on
+  <say-as interpret-as="date" format="mdy"> 3/21/2012 </say-as>, with early
+  arrival at <say-as interpret-as="time" format="hms12"> 12:35pm </say-as>
+  has been confirmed. Please call <say-as interpret-as="telephone" format="1">
+  (888) 555-1212 </say-as> with any questions.
+
+</speak>
+
