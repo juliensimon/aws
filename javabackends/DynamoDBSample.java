@@ -49,7 +49,7 @@ public class DynamoDBSample {
 		 * AmazonDynamoDB dynamoDB = AmazonDynamoDBClientBuilder.standard()
 		 * .withEndpointConfiguration( new
 		 * AwsClientBuilder.EndpointConfiguration("http://localhost:8000",
-		 * Regions.US_EAST_1)) .build();
+		 * "us-east-1")) .build();
 		 */
 
 		// No login/password for DynamoDB, we use AWS credentials
