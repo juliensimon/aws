@@ -1,40 +1,46 @@
 package com.amazonaws.samples;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Set;
 
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.AmazonServiceException;
-import com.amazonaws.regions.Regions;
+import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
+import com.amazonaws.services.dynamodbv2.document.DeleteItemOutcome;
 import com.amazonaws.services.dynamodbv2.document.DynamoDB;
+import com.amazonaws.services.dynamodbv2.document.Index;
 import com.amazonaws.services.dynamodbv2.document.Item;
-import com.amazonaws.services.dynamodbv2.document.PutItemOutcome;
+import com.amazonaws.services.dynamodbv2.document.ItemCollection;
+import com.amazonaws.services.dynamodbv2.document.QueryOutcome;
+import com.amazonaws.services.dynamodbv2.document.ScanOutcome;
 import com.amazonaws.services.dynamodbv2.document.Table;
+import com.amazonaws.services.dynamodbv2.document.UpdateItemOutcome;
+import com.amazonaws.services.dynamodbv2.document.spec.QuerySpec;
+import com.amazonaws.services.dynamodbv2.document.spec.ScanSpec;
+import com.amazonaws.services.dynamodbv2.document.spec.UpdateItemSpec;
+import com.amazonaws.services.dynamodbv2.document.utils.NameMap;
+import com.amazonaws.services.dynamodbv2.document.utils.ValueMap;
 import com.amazonaws.services.dynamodbv2.model.AttributeDefinition;
-import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.services.dynamodbv2.model.CreateTableRequest;
 import com.amazonaws.services.dynamodbv2.model.DescribeTableRequest;
+import com.amazonaws.services.dynamodbv2.model.GlobalSecondaryIndex;
 import com.amazonaws.services.dynamodbv2.model.KeySchemaElement;
 import com.amazonaws.services.dynamodbv2.model.KeyType;
+import com.amazonaws.services.dynamodbv2.model.Projection;
+import com.amazonaws.services.dynamodbv2.model.ProjectionType;
 import com.amazonaws.services.dynamodbv2.model.ProvisionedThroughput;
 import com.amazonaws.services.dynamodbv2.model.ScalarAttributeType;
-import com.amazonaws.services.dynamodbv2.model.ScanRequest;
-import com.amazonaws.services.dynamodbv2.model.ScanResult;
 import com.amazonaws.services.dynamodbv2.model.TableDescription;
 import com.amazonaws.services.dynamodbv2.util.TableUtils;
+import com.amazonaws.services.dynamodbv2.util.TableUtils.TableNeverTransitionedToStateException;
 
 public class DynamoDBSample {
 
-	private final static String tableName = "my-favorite-movies-table";
-	
-	private static Item newItem(String name, int year, String rating, String... characters) {
-		return new Item().withPrimaryKey("name", name)
-				.withInt("year", year)
-				.withString("rating", rating)
-				.withStringSet("characters", characters);
-	}
+	private final static String ratingIndexName = "ratingIndex";
+	private final static String tableName = "moviesTable";
 
 	public static void main(String[] args) throws Exception {
 
@@ -45,75 +51,39 @@ public class DynamoDBSample {
 		 * 
 		 * $ java -Djava.library.path=./DynamoDBLocal_lib -jar DynamoDBLocal.jar
 		 * -sharedDb
-		 * 
-		 * AmazonDynamoDB dynamoDB = AmazonDynamoDBClientBuilder.standard()
-		 * .withEndpointConfiguration( new
-		 * AwsClientBuilder.EndpointConfiguration("http://localhost:8000",
-		 * "us-east-1")) .build();
 		 */
 
-		// No login/password for DynamoDB, we use AWS credentials
-		AmazonDynamoDB client = AmazonDynamoDBClientBuilder.standard().withRegion(Regions.EU_WEST_1).build();
-		DynamoDB dynamoDB = new DynamoDB(client);
-
 		try {
+			// Connection to local DynamoDB
+			AmazonDynamoDB client = AmazonDynamoDBClientBuilder.standard()
+					.withEndpointConfiguration(new EndpointConfiguration("http://localhost:8000", "us-east-1")).build();
 
-			// Create a table with a primary hash key named 'name', which holds
-			// a string
-			CreateTableRequest createTableRequest = new CreateTableRequest().withTableName(tableName)
-					.withKeySchema(new KeySchemaElement().withAttributeName("name").withKeyType(KeyType.HASH))
-					.withAttributeDefinitions(new AttributeDefinition().withAttributeName("name")
-							.withAttributeType(ScalarAttributeType.S))
-					.withProvisionedThroughput(
-							new ProvisionedThroughput().withReadCapacityUnits(1L).withWriteCapacityUnits(1L));
+			// Connection to remote DynamoDB
+			// AmazonDynamoDB client =
+			// AmazonDynamoDBClientBuilder.standard().withRegion(Regions.EU_WEST_1).build();
 
-			// Create table if it does not exist yet
-			TableUtils.createTableIfNotExists(client, createTableRequest);
-			// wait for the table to move into ACTIVE state
-			TableUtils.waitUntilActive(client, tableName);
-			Table table = dynamoDB.getTable(tableName);
+			Table table = createMovieTable(client);
+			printTableDescription(client, table);
+			// put item
+			addMoviesToTable(table);
+			// get item with table hash key
+			printMovie(table, "The Return of the Jedi");
 
-			// Describe our new table
-			DescribeTableRequest describeTableRequest = new DescribeTableRequest().withTableName(tableName);
-			TableDescription tableDescription = client.describeTable(describeTableRequest).getTable();
-			System.out.println("Table Description: " + tableDescription);
-
-			// Add a few items
-			Item item = newItem("Star Wars", 1977, "*****", "Luke", "Leia", "Obiwan", "C-3PO", "R2-D2", "Han", "Chewie");
-			PutItemOutcome putResult = table.putItem(item);
-			System.out.println("Result: " + putResult);
-			
-			item = newItem("Star Trek", 1979, "****", "Kirk", "Spock", "Scottie");
-			putResult = table.putItem(item);
-			System.out.println("Result: " + putResult);
-
-			item = newItem("The Phantom Menace", 1999, "*", "Anakin", "Padme", "Jar Jar Binks");
-			putResult = table.putItem(item);
-			System.out.println("Result: " + putResult);
-			
-			item = newItem("The Lord of the Rings", 2001, "*****", "Frodo", "Gandalf", "Aragorn", "Legolas", "Gimli");
-			putResult = table.putItem(item);
-			System.out.println("Result: " + putResult);
-
-			// Get an item
-			item = table.getItem("name", "Star Wars");
-			System.out.println("Item: " + item.toJSONPretty());
-
-			// Find all 5-star movies
-			Map<String, AttributeValue> expressionAttributeValues = 
-				    new HashMap<String, AttributeValue>();
-				expressionAttributeValues.put(":v_rating", new AttributeValue().withS("*****"));
-				
-	        ScanRequest scanRequest = new ScanRequest()
-	        	    .withTableName(tableName)
-	        	    .withFilterExpression("rating = :v_rating")
-	        	    .withExpressionAttributeValues(expressionAttributeValues);
-	        
-			ScanResult items = client.scan(scanRequest);
-			System.out.println("Found "+items.getCount()+ " 5-star movies");
-			for (Map<String, AttributeValue> i : items.getItems()) {
-			    System.out.println(i);
-			}
+			// update item
+			addCharacterToMovie(table, "Jabba", "The Return of the Jedi");
+			// get item with table hash key
+			printMovie(table, "The Return of the Jedi");
+			// query GSI with index hash key
+			printMoviesByRating(table, "*");
+			// query GSI with index hash & range keys
+			printMoviesByRatingAndDateRange(table, "*****", 1975, 1982);
+			// scan table on String attribute
+			printMoviesBySeries(table, "Star Wars");
+			// scan table on String Set attribute
+			printMoviesWithCharacter(table, "Yoda");
+			// delete item
+			deleteBadMovies(table);
+			printMoviesByRating(table, "*");
 			
 		} catch (AmazonServiceException ase) {
 			System.out.println("Amazon Message:   " + ase.getMessage());
@@ -124,5 +94,164 @@ public class DynamoDBSample {
 		} catch (AmazonClientException ace) {
 			System.out.println("Client Message: " + ace.getMessage());
 		}
+	}
+
+	private static void addCharacterToMovie(Table table, String character, String title) {
+		System.out.println("*** Adding character " + character + " to movie " + title);
+		Item movie = table.getItem("title", title);
+		try {
+			Set<String> movieCharacters = movie.getStringSet("characters");
+			movieCharacters.add(character);
+			UpdateItemSpec updateSpec = new UpdateItemSpec().withUpdateExpression("SET #characters = :characters")
+					.withNameMap(new NameMap().with("#characters", "characters"))
+					.withValueMap(new ValueMap().with(":characters", movieCharacters))
+					.withPrimaryKey("title", movie.getString("title"));
+			UpdateItemOutcome result = table.updateItem(updateSpec);
+			System.out.println(result);
+		}
+		catch(NullPointerException e) {
+			System.out.println("ERROR: movie " + title + " not found");
+		}
+		finally {
+			System.out.println("*** Done");
+		}
+	}
+
+	private static void addMoviesToTable(Table table) {
+		System.out.println("*** Adding movies");
+		putMovie(table, "Star Wars", "A New Hope", 1977, "*****", "Luke", "Leia", "Obiwan", "C-3PO", "R2-D2", "Han",
+				"Chewie");
+		putMovie(table, "Star Wars", "The Empire Strikes Back", 1981, "*****", "Luke", "Leia", "Darth Vader", "C-3PO",
+				"R2-D2", "Han", "Chewie");
+		putMovie(table, "Star Wars", "The Return of the Jedi", 1983, "*****", "Yoda", "Darth Vader", "Luke", "Leia",
+				"C-3PO", "R2-D2", "Han", "Chewie");
+		putMovie(table, "Star Wars", "The Phantom Menace", 1999, "*", "Anakin", "Padme", "Yoda", "Jar Jar Binks");
+		System.out.println("*** Done");
+	}
+
+	private static Table createMovieTable(AmazonDynamoDB client) {
+		System.out.println("*** Creating table");
+		// Define attributes
+		ArrayList<AttributeDefinition> attributeDefinitions = new ArrayList<AttributeDefinition>();
+		attributeDefinitions.add(new AttributeDefinition("title", ScalarAttributeType.S));
+		attributeDefinitions.add(new AttributeDefinition("rating", ScalarAttributeType.S));
+		attributeDefinitions.add(new AttributeDefinition("releaseDate", ScalarAttributeType.N));
+		// Define secondary index
+		GlobalSecondaryIndex ratingIndex = new GlobalSecondaryIndex().withIndexName(ratingIndexName)
+				.withKeySchema(new KeySchemaElement("rating", KeyType.HASH),
+						new KeySchemaElement("releaseDate", KeyType.RANGE))
+				.withProjection(new Projection().withProjectionType(ProjectionType.ALL))
+				.withProvisionedThroughput(new ProvisionedThroughput(1L, 1L));
+		// Create table and wait for it to be active
+		CreateTableRequest createTableRequest = new CreateTableRequest().withTableName(tableName)
+				.withKeySchema(new KeySchemaElement("title", KeyType.HASH))
+				.withAttributeDefinitions(attributeDefinitions).withGlobalSecondaryIndexes(ratingIndex)
+				.withProvisionedThroughput(new ProvisionedThroughput(1L, 1L));
+		TableUtils.createTableIfNotExists(client, createTableRequest);
+
+		try {
+			TableUtils.waitUntilActive(client, tableName);
+		} catch (TableNeverTransitionedToStateException e) {
+			e.printStackTrace();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		System.out.println("*** Done");
+		return new DynamoDB(client).getTable(tableName);
+	}
+
+	private static void deleteBadMovies(Table table) {
+		System.out.println("*** Deleting bad movies");
+		ItemCollection<QueryOutcome> movies = findMoviesByRating(table, "*");
+		Iterator<Item> iter = movies.iterator();
+		while (iter.hasNext()) {
+			Item i = iter.next();
+			DeleteItemOutcome result = table.deleteItem("title", i.getString("title"));
+			System.out.println(result);
+		}
+		System.out.println("*** Done");
+	}
+
+	private static ItemCollection<QueryOutcome> findMoviesByRating(Table table, String rating) {
+		Index titleIndex = table.getIndex(ratingIndexName);
+		QuerySpec spec = new QuerySpec().withKeyConditionExpression("rating = :v_rating")
+				.withValueMap(new ValueMap().withString(":v_rating", rating));
+		ItemCollection<QueryOutcome> movies = titleIndex.query(spec);
+		return movies;
+	}
+
+	private static void prettyPrintItems(ItemCollection<?> items) {
+		Iterator<Item> iter = items.iterator();
+		while (iter.hasNext()) {
+			System.out.println(iter.next().toJSONPretty());
+		}
+	}
+
+	private static void printMovie(Table table, String title) {
+		System.out.println("*** Printing movie " + title);
+		Item movie = table.getItem("title", title);
+		try {
+			System.out.println("Item: " + movie.toJSONPretty());
+		}
+		catch (NullPointerException e) {
+			System.out.println("ERROR: movie " + title + " not found");
+		}
+		System.out.println("*** Done");
+	}
+
+	private static void printMoviesByRating(Table table, String rating) {
+		System.out.println("*** Printing movies with rating " + rating);
+		ItemCollection<QueryOutcome> movies = findMoviesByRating(table, rating);
+		prettyPrintItems(movies);
+		System.out.println("*** Done");
+	}
+
+	private static void printMoviesByRatingAndDateRange(Table table, String rating, int startYear, int endYear) {
+		System.out.println("*** Printing movies between " + startYear + " and " + endYear + " with rating " + rating);
+		Index titleIndex = table.getIndex(ratingIndexName);
+		QuerySpec spec = new QuerySpec()
+				.withKeyConditionExpression("rating = :v_rating and releaseDate between :v_start and :v_end")
+				.withValueMap(new ValueMap().withString(":v_rating", rating).withInt(":v_start", startYear)
+						.withInt(":v_end", endYear));
+		ItemCollection<QueryOutcome> movies = titleIndex.query(spec);
+		prettyPrintItems(movies);
+		System.out.println("*** Done");
+	}
+
+	private static void printMoviesBySeries(Table table, String series) {
+		System.out.println("*** Printing movies from series " + series);
+		// 'series' is neither a key nor an index: we need to scan the table
+		ScanSpec scanSpec = new ScanSpec().withFilterExpression("series = :v_series")
+				.withValueMap(new ValueMap().withString(":v_series", series));
+		ItemCollection<ScanOutcome> movies = table.scan(scanSpec);
+		prettyPrintItems(movies);
+		System.out.println("*** Done");
+	}
+
+	private static void printMoviesWithCharacter(Table table, String character) {
+		System.out.println("*** Printing movies with character " + character);
+		// 'characters' is neither a key nor an index: we need to scan the table
+		ScanSpec scanSpec = new ScanSpec().withFilterExpression("contains(characters, :v_character)")
+				.withValueMap(new ValueMap().withString(":v_character", character));
+		ItemCollection<ScanOutcome> movies = table.scan(scanSpec);
+		prettyPrintItems(movies);
+		System.out.println("*** Done");
+
+	}
+
+	private static void printTableDescription(AmazonDynamoDB client, Table table) {
+		System.out.println("*** Describing table");
+		DescribeTableRequest describeTableRequest = new DescribeTableRequest(tableName);
+		TableDescription tableDescription = client.describeTable(describeTableRequest).getTable();
+		System.out.println("Table Description: " + tableDescription);
+		System.out.println("*** Done");
+	}
+
+	private static void putMovie(Table table, String series, String title, int releaseDate, String rating,
+			String... characters) {
+		Item movie = new Item().withPrimaryKey("title", title).withString("series", series)
+				.withInt("releaseDate", releaseDate).withString("rating", rating)
+				.withStringSet("characters", characters);
+		System.out.println("Added movie " + title + " " + table.putItem(movie));
 	}
 }
