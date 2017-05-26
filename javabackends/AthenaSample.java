@@ -68,17 +68,18 @@ public class AthenaSample {
 		return count;
 	}
 
-	private static ListQueryExecutionsResult listPastQueries(AmazonAthena client, int count) {
-		ListQueryExecutionsRequest listQueryReq = new ListQueryExecutionsRequest().withMaxResults(count);
-		ListQueryExecutionsResult listQueryRes  = client.listQueryExecutions(listQueryReq);
-		return listQueryRes;
-	}
-
 	private static void printPastQueries(AmazonAthena client, ListQueryExecutionsResult listQueryRes) {
 		for (String queryId : listQueryRes.getQueryExecutionIds()) {
 			GetQueryExecutionRequest getReq = new GetQueryExecutionRequest().withQueryExecutionId(queryId);
 			GetQueryExecutionResult getRes  = client.getQueryExecution(getReq);
-			System.out.println(getRes);
+			prettyPrintQueryExecution(getRes.getQueryExecution());
 		}
+	}
+
+	private static void prettyPrintQueryExecution(QueryExecution q) {
+		System.out.println("Query:  " + q.getQuery());
+		System.out.println("   Status : " + q.getStatus().getState());
+		System.out.println("   Time   : " + q.getStatistics().getEngineExecutionTimeInMillis() + "ms");
+		System.out.println("   Scanned: " + q.getStatistics().getDataScannedInBytes()/1024/1024 + "MB");
 	}
 }
