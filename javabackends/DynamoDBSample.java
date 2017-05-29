@@ -2,6 +2,7 @@ package com.amazonaws.samples;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 import com.amazonaws.AmazonClientException;
@@ -9,6 +10,7 @@ import com.amazonaws.AmazonServiceException;
 import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
+import com.amazonaws.services.dynamodbv2.document.BatchGetItemOutcome;
 import com.amazonaws.services.dynamodbv2.document.DeleteItemOutcome;
 import com.amazonaws.services.dynamodbv2.document.DynamoDB;
 import com.amazonaws.services.dynamodbv2.document.Index;
@@ -17,6 +19,7 @@ import com.amazonaws.services.dynamodbv2.document.ItemCollection;
 import com.amazonaws.services.dynamodbv2.document.QueryOutcome;
 import com.amazonaws.services.dynamodbv2.document.ScanOutcome;
 import com.amazonaws.services.dynamodbv2.document.Table;
+import com.amazonaws.services.dynamodbv2.document.TableKeysAndAttributes;
 import com.amazonaws.services.dynamodbv2.document.UpdateItemOutcome;
 import com.amazonaws.services.dynamodbv2.document.spec.QuerySpec;
 import com.amazonaws.services.dynamodbv2.document.spec.ScanSpec;
@@ -60,31 +63,33 @@ public class DynamoDBSample {
 
 			// Connection to remote DynamoDB
 			// AmazonDynamoDB client =
-			// AmazonDynamoDBClientBuilder.standard().withRegion(Regions.EU_WEST_1).build();
+			// AmazonDynamoDBClientBuilder.standard().withRegion(Regions.US_EAST_1).build();
+
+			// Needed for batch get item
+			DynamoDB dynamoDB = new DynamoDB(client);
 
 			Table table = createMovieTable(client);
 			printTableDescription(client, table);
-			// put item
+			// putItem API
 			addMoviesToTable(table);
-			// get item with table hash key
+			// getItem API, table hash key
 			printMovie(table, "The Return of the Jedi");
-
-			// update item
+			// batchGetItem API, table hash key
+			printMoviesbyTitles(dynamoDB, table, "A New Hope", "The Return of the Jedi");
+			// updateItem API
 			addCharacterToMovie(table, "Jabba", "The Return of the Jedi");
-			// get item with table hash key
 			printMovie(table, "The Return of the Jedi");
-			// query GSI with index hash key
+			// query API, GSI with index hash key
 			printMoviesByRating(table, "*");
-			// query GSI with index hash & range keys
+			// query API, GSI with index hash & range keys
 			printMoviesByRatingAndDateRange(table, "*****", 1975, 1982);
-			// scan table on String attribute
+			// scan API, String attribute
 			printMoviesBySeries(table, "Star Wars");
-			// scan table on String Set attribute
+			// scan API, String Set attribute
 			printMoviesWithCharacter(table, "Yoda");
-			// delete item
+			// deleteItem API
 			deleteBadMovies(table);
 			printMoviesByRating(table, "*");
-			
 		} catch (AmazonServiceException ase) {
 			System.out.println("Amazon Message:   " + ase.getMessage());
 			System.out.println("HTTP Status Code: " + ase.getStatusCode());
@@ -108,11 +113,9 @@ public class DynamoDBSample {
 					.withPrimaryKey("title", movie.getString("title"));
 			UpdateItemOutcome result = table.updateItem(updateSpec);
 			System.out.println(result);
-		}
-		catch(NullPointerException e) {
+		} catch (NullPointerException e) {
 			System.out.println("ERROR: movie " + title + " not found");
-		}
-		finally {
+		} finally {
 			System.out.println("*** Done");
 		}
 	}
@@ -131,7 +134,7 @@ public class DynamoDBSample {
 
 	private static Table createMovieTable(AmazonDynamoDB client) {
 		System.out.println("*** Creating table");
-		// Define attributes
+		// Define attributes used as table & index keys
 		ArrayList<AttributeDefinition> attributeDefinitions = new ArrayList<AttributeDefinition>();
 		attributeDefinitions.add(new AttributeDefinition("title", ScalarAttributeType.S));
 		attributeDefinitions.add(new AttributeDefinition("rating", ScalarAttributeType.S));
@@ -187,14 +190,42 @@ public class DynamoDBSample {
 		}
 	}
 
+	private static void prettyPrintItems(List<Item> items) {
+		for (Item i : items) {
+			System.out.println(i.toJSONPretty());
+		}
+	}
+
 	private static void printMovie(Table table, String title) {
 		System.out.println("*** Printing movie " + title);
 		Item movie = table.getItem("title", title);
 		try {
 			System.out.println("Item: " + movie.toJSONPretty());
-		}
-		catch (NullPointerException e) {
+		} catch (NullPointerException e) {
 			System.out.println("ERROR: movie " + title + " not found");
+		}
+		System.out.println("*** Done");
+	}
+
+	private static void printMoviesbyTitles(DynamoDB client, Table table, String... titles) {
+		System.out.println("*** Printing movies");
+		/*
+		 * batchGetItem() can get items from different tables in a single
+		 * operation. For each table, we need to provide a
+		 * TableKeysAndAttributes object holding the key(s) defined on the
+		 * table, as well as the values we're looking for.
+		 */
+		TableKeysAndAttributes movieTitles = new TableKeysAndAttributes(table.getTableName()).withHashOnlyKeys("title",
+				(Object[]) titles);
+		BatchGetItemOutcome res = client.batchGetItem(movieTitles);
+		/*
+		 * The return value of batchGetItem() holds for each table a list of
+		 * items corresponding to the key values we provided. We can also find
+		 * out about key values that were not found.
+		 */
+		prettyPrintItems(res.getTableItems().get(table.getTableName()));
+		if (res.getUnprocessedKeys().size() != 0) {
+			System.out.println("At least one key was not found");
 		}
 		System.out.println("*** Done");
 	}
@@ -236,7 +267,6 @@ public class DynamoDBSample {
 		ItemCollection<ScanOutcome> movies = table.scan(scanSpec);
 		prettyPrintItems(movies);
 		System.out.println("*** Done");
-
 	}
 
 	private static void printTableDescription(AmazonDynamoDB client, Table table) {
