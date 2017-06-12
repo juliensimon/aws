@@ -1,8 +1,8 @@
-export REGION_NAME=ap-southeast-1
+export REGION_NAME=eu-west-1
 
 # Use https://github.com/blox/blox/blob/dev/deploy/aws/conf/cloudformation_template.json
 
-aws cloudformation create-stack --stack-name BloxCluster --template-body file://cloudformation_template.json --region $REGION_NAME
+aws cloudformation create-stack --stack-name BloxCluster --template-body file://cloudformation_template.json --region $REGION_NAME -capabilities CAPABILITY_NAMED_IAM
 
 ecs-cli configure --cluster WebCluster --region $REGION_NAME
 
