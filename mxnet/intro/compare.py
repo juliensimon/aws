@@ -9,7 +9,7 @@ def loadModel(modelname):
 	sym, arg_params, aux_params = mx.model.load_checkpoint(modelname, 0)
 	t2 = time.time()
         t = 1000*(t2-t1)
-        print("Loaded in %2.2f microseconds" % t)
+        print("Loaded in %2.2f milliseconds" % t)
 	arg_params['prob_label'] = mx.nd.array([0])
 	mod = mx.mod.Module(symbol=sym)
 	mod.bind(for_training=False, data_shapes=[('data', (1,3,224,224))])
@@ -39,7 +39,7 @@ def predict(filename, model, categories, n):
 	model.forward(Batch([array]))
 	t2 = time.time()
 	t = 1000*(t2-t1)
-	print("Predicted in %2.2f microseconds" % t)
+	print("Predicted in %2.2f milliseconds" % t)
     	prob = model.get_outputs()[0].asnumpy()
 	prob = np.squeeze(prob)
     	sortedprobindex = np.argsort(prob)[::-1]
