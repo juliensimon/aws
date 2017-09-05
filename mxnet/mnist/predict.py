@@ -1,6 +1,6 @@
 import mxnet as mx
 import numpy as np
-import cv2
+import cv2, time
 from collections import namedtuple
 
 def loadModel():
@@ -23,7 +23,10 @@ def predict(model, filename):
 	array = loadImage(filename)
 	
 	Batch = namedtuple('Batch', ['data'])
+	time1 = time.time()
 	mod.forward(Batch([array]))
+        time2 = time.time()
+        print 'Time: %0.0f microseconds' % ((time2-time1)*1000000) 
 	pred = mod.get_outputs()[0].asnumpy()
 	return pred
 
