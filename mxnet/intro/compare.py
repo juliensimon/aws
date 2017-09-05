@@ -32,14 +32,17 @@ def prepareNDArray(filename):
     	img = img[np.newaxis, :]
 	return mx.nd.array(img) 
 
-def predict(filename, model, categories, n):
+def predict(filename, model, categories, n, iter):
 	array = prepareNDArray(filename)
 	Batch = namedtuple('Batch', ['data'])
-	t1 = time.time()
-	model.forward(Batch([array]))
-	t2 = time.time()
-	t = 1000*(t2-t1)
-	print("Predicted in %2.2f milliseconds" % t)
+	sum = 0
+	for i in range(iter):
+		t1 = time.time()
+		model.forward(Batch([array]))
+		t2 = time.time()
+		sum = sum + 1000000*(t2-t1)
+
+	print("Predicted in %2.0f microseconds" % (sum/iter))
     	prob = model.get_outputs()[0].asnumpy()
 	prob = np.squeeze(prob)
     	sortedprobindex = np.argsort(prob)[::-1]
@@ -59,10 +62,12 @@ inceptionv3,c = init("Inception-BN")
 
 filename = sys.argv[1] 
 
+iter = 100
+
 print ("*** VGG16")
-print predict(filename,vgg16,c,5)
+print predict(filename,vgg16,c,5, iter)
 print ("*** ResNet-152")
-print predict(filename,resnet152,c,5)
+print predict(filename,resnet152,c,5, iter)
 print ("*** Inception v3")
-print predict(filename,inceptionv3,c,5)
+print predict(filename,inceptionv3,c,5, iter)
 
