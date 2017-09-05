@@ -4,8 +4,9 @@ import cv2
 from collections import namedtuple
 
 def loadModel():
-	lenet, arg_params, aux_params = mx.model.load_checkpoint("lenet", 10)
-	mod = mx.mod.Module(lenet)
+	model, arg_params, aux_params = mx.model.load_checkpoint("mlp", 10)
+	#model, arg_params, aux_params = mx.model.load_checkpoint("lenet", 10)
+	mod = mx.mod.Module(model)
 	mod.bind(for_training=False, data_shapes=[('data', (1,1,28,28))])
 	mod.set_params(arg_params, aux_params)
 	return mod
