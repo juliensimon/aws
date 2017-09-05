@@ -1,7 +1,7 @@
 
 import mxnet as mx
 import numpy as np
-import cv2
+import cv2, time
 from collections import namedtuple
 
 def loadInceptionv3():
@@ -30,7 +30,10 @@ def prepareNDArray(filename):
 def predict(filename, model, categories, n):
 	array = prepareNDArray(filename)
 	Batch = namedtuple('Batch', ['data'])
+	time1 = time.time()
 	model.forward(Batch([array]))
+	time2 = time.time()
+	print 'Time: %0.0f microseconds' % ((time2-time1)*1000000)
     	prob = model.get_outputs()[0].asnumpy()
 	prob = np.squeeze(prob)
     	sortedprobindex = np.argsort(prob)[::-1]
