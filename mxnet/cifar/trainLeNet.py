@@ -33,15 +33,15 @@ def saveCifarImage(array, path, file):
 def buildLeNet():
     data = mx.symbol.Variable('data')
     conv1 = mx.sym.Convolution(data=data, kernel=(5,5), num_filter=128)
-    tanh1 = mx.sym.Activation(data=conv1, act_type="tanh")
-    pool1 = mx.sym.Pooling(data=tanh1, pool_type="max", kernel=(2,2), stride=(2,2))
+    relu1 = mx.sym.Activation(data=conv1, act_type="relu")
+    pool1 = mx.sym.Pooling(data=relu1, pool_type="max", kernel=(2,2), stride=(2,2))
     conv2 = mx.sym.Convolution(data=pool1, kernel=(5,5), num_filter=256)
-    tanh2 = mx.sym.Activation(data=conv2, act_type="tanh")
-    pool2 = mx.sym.Pooling(data=tanh2, pool_type="max", kernel=(2,2), stride=(2,2))
+    relu2 = mx.sym.Activation(data=conv2, act_type="relu")
+    pool2 = mx.sym.Pooling(data=relu2, pool_type="max", kernel=(2,2), stride=(2,2))
     flatten = mx.sym.Flatten(data=pool2)
     fc1 = mx.symbol.FullyConnected(data=flatten, num_hidden=500)
-    tanh3 = mx.sym.Activation(data=fc1, act_type="tanh")
-    fc2 = mx.sym.FullyConnected(data=tanh3, num_hidden=10)
+    relu3 = mx.sym.Activation(data=fc1, act_type="relu")
+    fc2 = mx.sym.FullyConnected(data=relu3, num_hidden=10)
     lenet = mx.sym.SoftmaxOutput(data=fc2, name='softmax')
     return lenet
 
@@ -52,17 +52,11 @@ batch=128
 #    saveCifarImage(i1[i], "./", "img"+(str)(i))
 #    print cats[l1[i]]
 
-training_data = []
-training_label = []
-
-for f in ("data_batch_1", "data_batch_2", "data_batch_3", "data_batch_4", "data_batch_5"):
+training_data, training_label = extractImagesAndLabels(path, "data_batch_1")
+for f in ("data_batch_2", "data_batch_3", "data_batch_4", "data_batch_5"):
     imgarray, lblarray = extractImagesAndLabels(path, f)
-    if not training_data:
-        training_data = imgarray
-        training_label = lblarray
-    else:
-        training_data = mx.nd.concatenate([training_data, imgarray])
-        training_label = mx.nd.concatenate([training_label, lblarray])
+    training_data = mx.nd.concatenate([training_data, imgarray])
+    training_label = mx.nd.concatenate([training_label, lblarray])
 
 print training_data.shape    
 print training_label.shape    
@@ -75,8 +69,9 @@ valid_iter = mx.io.NDArrayIter(data=valid_data,label=valid_label,batch_size=batc
 lenet = buildLeNet()
 mod = mx.mod.Module(lenet, context=(mx.gpu(0), mx.gpu(1), mx.gpu(2), mx.gpu(3)))
 mod.bind(data_shapes=train_iter.provide_data, label_shapes=train_iter.provide_label)
-mod.init_params(initializer=mx.init.Normal())
-mod.fit(train_iter, eval_data=valid_iter, optimizer_params={'learning_rate':0.01, 'momentum': 0.9}, num_epoch=300)
+mod.init_params(initializer=mx.init.Xavier(magnitude=2.))
+mod.init_optimizer(optimizer='adagrad')
+mod.fit(train_iter, eval_data=valid_iter, num_epoch=300)
 
 mod.save_checkpoint("lenet", 300)
 
