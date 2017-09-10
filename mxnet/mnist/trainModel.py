@@ -3,6 +3,8 @@ import logging
 
 logging.basicConfig(level=logging.INFO)
 
+nb_epochs=200
+
 train_iter = mx.io.MNISTIter(shuffle=True)
 val_iter = mx.io.MNISTIter(image="./t10k-images-idx3-ubyte", label="./t10k-labels-idx1-ubyte")
 
@@ -19,10 +21,10 @@ mod = mx.mod.Module(mlp)
 mod.bind(data_shapes=train_iter.provide_data, label_shapes=train_iter.provide_label)
 #mod.init_params()
 mod.init_params(initializer=mx.init.Xavier(magnitude=2.))
-mod.init_optimizer(optimizer_params=(('learning_rate', 0.1), ))
-mod.fit(train_iter, num_epoch=10)
+mod.init_optimizer('adam')
+mod.fit(train_iter, eval_data=val_iter, num_epoch=nb_epochs)
 
-mod.save_checkpoint("mlp", 10)
+mod.save_checkpoint("mlp", nb_epochs)
 
 metric = mx.metric.Accuracy()
 mod.score(val_iter, metric)
