@@ -20,3 +20,7 @@ def splitRGBImage(filename):
 	blue = cv2.resize(blue, (224, 224,))
 	cv2.imwrite("blue_"+filename, blue)
 
+if __name__ == '__main__':
+	splitRGBImage("kreator.jpeg")
+
+
