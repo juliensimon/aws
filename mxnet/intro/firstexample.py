@@ -17,13 +17,13 @@ Y = mx.nd.empty((sample_count,))
 for i in range(0,sample_count-1):
   Y[i] = np.random.randint(0,category_count)
 
-X_train = mx.nd.crop(X, begin=(0,0), end=(train_count,feature_count-1))
+X_train = mx.nd.crop(X, begin=(0,0), end=(train_count,feature_count))
 Y_train = Y[0:train_count]
 
-X_valid = mx.nd.crop(X, begin=(train_count,0), end=(sample_count,feature_count-1))
+X_valid = mx.nd.crop(X, begin=(train_count,0), end=(sample_count,feature_count))
 Y_valid = Y[train_count:sample_count]
 
-#print(X.shape, Y.shape, X_train.shape, Y_train.shape, X_valid.shape, Y_valid.shape)
+print(X.shape, Y.shape, X_train.shape, Y_train.shape, X_valid.shape, Y_valid.shape)
 
 # Build network
 data = mx.sym.Variable('data')
@@ -43,20 +43,18 @@ train_iter = mx.io.NDArrayIter(data=X_train,label=Y_train,batch_size=batch)
 mod.bind(data_shapes=train_iter.provide_data, label_shapes=train_iter.provide_label)
 mod.init_params(initializer=mx.init.Xavier(magnitude=2.))
 mod.init_optimizer(optimizer='sgd', optimizer_params=(('learning_rate', 0.1), ))
-mod.fit(train_iter, num_epoch=60)
+mod.fit(train_iter, num_epoch=50)
 
-#pred_iter = mx.io.NDArrayIter(data=X_train,label=Y_train, batch_size=batch)
-#pred_count = train_count
 pred_iter = mx.io.NDArrayIter(data=X_valid,label=Y_valid, batch_size=batch)
 pred_count = valid_count
 
 correct_preds = total_correct_preds = 0
-print('batch [labels] [predicted labels]  correct predictions')
+#print('batch [labels] [predicted labels]  correct predictions')
 for preds, i_batch, batch in mod.iter_predict(pred_iter):
     label = batch.label[0].asnumpy().astype(int)
     pred_label = preds[0].asnumpy().argmax(axis=1)
     correct_preds = np.sum(pred_label==label)
-    print i_batch, label, pred_label, correct_preds
+    #print i_batch, label, pred_label, correct_preds
     total_correct_preds = total_correct_preds + correct_preds
 
 print('Validation accuracy: %2.2f' % (1.0*total_correct_preds/pred_count))
