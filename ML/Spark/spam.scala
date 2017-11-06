@@ -19,6 +19,10 @@ val tf = new HashingTF(numFeatures = 1000)
 val spamFeatures = spam.map(email => tf.transform(email.split(" ")))
 val hamFeatures = ham.map(email => tf.transform(email.split(" ")))
 
+// Create LabeledPoint datasets for positive (spam) and negative (ham) examples.
+val positiveExamples = spamFeatures.map(features => LabeledPoint(1, features))
+val negativeExamples = hamFeatures.map(features => LabeledPoint(0, features))
+
 val data = positiveExamples.union(negativeExamples)
 data.cache()
 // Split the data set 80/20
