@@ -47,7 +47,7 @@ train_iter = mx.io.NDArrayIter(data=X_train,label=Y_train,batch_size=batch)
 #for batch in train_iter:
 #  print batch.data
 #  print batch.label
-#val_iter.reset()
+#train_iter.reset()
 
 # Bind training iterator to model, set initial weights, set optimizer
 mod.bind(data_shapes=train_iter.provide_data, label_shapes=train_iter.provide_label)
