@@ -3,7 +3,7 @@ import logging
 
 logging.basicConfig(level=logging.INFO)
 
-nb_epochs=200
+nb_epochs=100
 
 train_iter = mx.io.MNISTIter(shuffle=True)
 val_iter = mx.io.MNISTIter(image="./t10k-images-idx3-ubyte", label="./t10k-labels-idx1-ubyte")
@@ -19,10 +19,10 @@ mlp  = mx.sym.SoftmaxOutput(data=fc3, name='softmax')
 
 mod = mx.mod.Module(mlp)
 mod.bind(data_shapes=train_iter.provide_data, label_shapes=train_iter.provide_label)
-#mod.init_params()
 mod.init_params(initializer=mx.init.Xavier(magnitude=2.))
 mod.init_optimizer('adam')
-mod.fit(train_iter, eval_data=val_iter, num_epoch=nb_epochs)
+mod.fit(train_iter, eval_data=val_iter, num_epoch=nb_epochs,
+	batch_end_callback=mx.callback.Speedometer(64, 100))
 
 mod.save_checkpoint("mlp", nb_epochs)
 
