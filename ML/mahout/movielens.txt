@@ -1,0 +1,19 @@
+
+
+wget http://files.grouplens.org/datasets/movielens/ml-1m.zip
+unzip ml-1m.zip
+cat ml-1m/ratings.dat | sed 's/::/,/g' | cut -f1-3 -d, > ratings.csv
+hadoop fs -put ratings.csv /ratings.csv
+
+hadoop fs -rm -r temp similarity-matrix recommendations
+
+mahout recommenditembased --input /ratings.csv --output recommendations --numRecommendations 10 --outputPathForSimilarityMatrix similarity-matrix --similarityClassname SIMILARITY_COSINE
+
+hadoop fs -ls recommendations
+hadoop fs -cat recommendations/part-r-00000 | head
+
+
+hadoop fs -rm -r temp similarity-matrix recommendations
+
+mahout recommenditembased --input s3://jsimon-public/ratings.csv --output s3://jsimon-public/recommendations --numRecommendations 10 --outputPathForSimilarityMatrix similarity-matrix --similarityClassname SIMILARITY_COSINE
+aws s3 ls s3://jsimon-public/recommendations/
