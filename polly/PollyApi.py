@@ -26,9 +26,10 @@ def speak(polly, text, format='ogg_vorbis', voice='Brian'):
     play('/tmp/sound')
     os.remove(filename)
 
-polly = connectToPolly()
-speak(polly, "Hello world, I'm Polly. Or Brian. Or anyone you want, really.")
-frenchString = "Et bien sûr, je parle très bien français ! ça vous étonne ?"
-speak(polly, frenchString.decode('utf8'), voice='Mathieu')
-icelandicString = "Gera þú hafa allir hugmynd um hvað ég er að segja? Örugglega ekki !"
-speak(polly, icelandicString.decode('utf8'), voice='Karl')
+if __name__=='__main__':
+	polly = connectToPolly()
+	speak(polly, "Hello world, I'm Polly. Or Brian. Or anyone you want, really.")
+	frenchString = "Et bien sûr, je parle très bien français ! ça vous étonne ?"
+	speak(polly, frenchString.decode('utf8'), voice='Mathieu')
+	icelandicString = "Gera þú hafa allir hugmynd um hvað ég er að segja? Örugglega ekki !"
+	speak(polly, icelandicString.decode('utf8'), voice='Karl')
