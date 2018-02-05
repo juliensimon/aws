@@ -4,8 +4,8 @@ import cv2, time
 from collections import namedtuple
 
 def loadModel():
-	model, arg_params, aux_params = mx.model.load_checkpoint("mlp", 10)
-	#model, arg_params, aux_params = mx.model.load_checkpoint("lenet", 10)
+	#model, arg_params, aux_params = mx.model.load_checkpoint("mlp", 100)
+	model, arg_params, aux_params = mx.model.load_checkpoint("lenet", 20)
 	mod = mx.mod.Module(model)
 	mod.bind(for_training=False, data_shapes=[('data', (1,1,28,28))])
 	mod.set_params(arg_params, aux_params)
@@ -25,9 +25,9 @@ def predict(model, filename):
 	Batch = namedtuple('Batch', ['data'])
 	time1 = time.time()
 	mod.forward(Batch([array]))
+	pred = mod.get_outputs()[0].asnumpy()
         time2 = time.time()
         print 'Time: %0.0f microseconds' % ((time2-time1)*1000000) 
-	pred = mod.get_outputs()[0].asnumpy()
 	return pred
 
 np.set_printoptions(precision=3, suppress=True)
