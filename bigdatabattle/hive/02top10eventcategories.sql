@@ -1,6 +1,6 @@
 use gdelt;
 CREATE TABLE tmp AS 
-SELECT eventcode, COUNT(globaleventid) AS nb_events FROM eventsparquet
+SELECT eventcode, COUNT(globaleventid) AS nb_events FROM eventsorc
 GROUP BY eventcode
 ORDER BY nb_events DESC LIMIT 10;
 

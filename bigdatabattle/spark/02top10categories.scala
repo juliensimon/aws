@@ -17,10 +17,10 @@ SELECT eventcode,
        eventcodes.description,
        nb_events
 FROM
-  (SELECT eventsparquet.eventcode,
-          COUNT(eventsparquet.globaleventid) AS nb_events
-   FROM eventsparquet
-   GROUP BY eventsparquet.eventcode
+  (SELECT eventsorc.eventcode,
+          COUNT(eventsorc.globaleventid) AS nb_events
+   FROM eventsorc
+   GROUP BY eventsorc.eventcode
    ORDER BY nb_events DESC
    LIMIT 10)
 JOIN eventcodes ON eventcode = eventcodes.code

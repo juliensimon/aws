@@ -1,2 +1,2 @@
 SELECT COUNT(*)
-FROM gdelt.eventsparquet;
+FROM gdelt.eventsorc;

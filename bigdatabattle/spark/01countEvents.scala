@@ -13,7 +13,7 @@ val df = sqlContext.sql("use gdelt")
 
 // Count events
 
-val df = sqlContext.sql("SELECT COUNT(*) FROM gdelt.eventsparquet")
+val df = sqlContext.sql("SELECT COUNT(*) FROM gdelt.eventsorc")
 
 time {
   df.collect()

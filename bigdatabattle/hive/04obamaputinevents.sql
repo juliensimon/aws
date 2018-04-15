@@ -1,10 +1,10 @@
 USE gdelt;
-WITH tmp as (SELECT eventsparquet.eventcode,
-         COUNT(eventsparquet.globaleventid) AS nb_events
-    FROM eventsparquet
+WITH tmp as (SELECT eventsorc.eventcode,
+         COUNT(eventsorc.globaleventid) AS nb_events
+    FROM eventsorc
     WHERE ((actor1name LIKE '%OBAMA' and actor2name LIKE '%PUTIN')
             OR (actor2name LIKE '%OBAMA' and actor1name LIKE '%PUTIN'))
-    GROUP BY  eventsparquet.eventcode
+    GROUP BY  eventsorc.eventcode
     ORDER BY  nb_events DESC)
 SELECT eventcode,
          eventcodes.description,
