@@ -10,8 +10,12 @@ import org.apache.spark.mllib.tree.configuration.BoostingStrategy
 
 // Load 2 types of emails from text files: spam and ham (non-spam).
 // Each line has text from one email.
-val spam = sc.textFile("s3://jsimon-public/spam")
-val ham = sc.textFile("s3://jsimon-public/ham") 
+//sc.hadoopConfiguration.set("fs.s3n.awsAccessKeyId", "XXXZZZHHH")
+//sc.hadoopConfiguration.set("fs.s3n.awsSecretAccessKey", "xxxxxxxxxxxxxxxxxxxxxxxxxxx")
+//val spam = sc.textFile("s3://jsimon-public/spam")
+//val ham = sc.textFile("s3://jsimon-public/ham")
+val spam = sc.textFile("file:///Users/julsimon/dev/aws/ML/Spark/spam")
+val ham = sc.textFile("file:///Users/julsimon/dev/aws/ML/Spark/ham")
 
 // Create a HashingTF instance to map email text to vectors of 1000 features.
 val tf = new HashingTF(numFeatures = 1000)
