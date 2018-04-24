@@ -8,6 +8,14 @@ app = Chalice(app_name="resizer")
 @app.route('/', methods=['POST'])
 def index():  
     body = app.current_request.json_body
+
+    if 'data' not in body:
+        raise BadRequestError('Missing image data')
+    if 'height' not in body:
+        raise BadRequestError('Missing image height')
+    if 'width' not in body:
+        raise BadRequestError('Missing image width')
+
     h = body['height']
     w = body['width']
     image = base64.b64decode(body['data'])
@@ -20,6 +28,8 @@ def index():
     image = cv2.resize(image, (h, w,))
     image = cv2.imencode('.jpeg', image)
 
+    data = base64.b64encode(image[1].tostring())
+
     print("%d %d %d %d %d " % (L, H, W, h, w))
 
-    return { 'data': base64.b64encode(image[1].tostring()) }
+    return { 'data': data }
