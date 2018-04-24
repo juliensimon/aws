@@ -1,4 +1,6 @@
 from chalice import Chalice
+from chalice import BadRequestError
+
 import base64, cv2
 import numpy as np
 
