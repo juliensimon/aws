@@ -1,0 +1,13 @@
+{
+  "version": "2.0",
+  "app_name": "predictor",
+  "autogen_policy": false,
+  "environment_variables": {
+    "ENDPOINT_NAME": "DEMO-imageclassification-ep--2018-04-23-19-55-49"
+  },
+  "stages": {
+    "dev": {
+      "api_gateway_stage": "api"
+    }
+  }
+}
