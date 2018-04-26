@@ -1,6 +1,7 @@
-export URL='http://localhost:8000'
+#export URL='http://localhost:8000'
+export URL='https://bg8phyixb4.execute-api.us-east-1.amazonaws.com/api/'
+
 export PIC='julien.jpg'
 
-curl -X POST -H "Content-Type: application/json" -d '{
-    "width": 32, "height": 32, "data": "'"$( base64 -i julien.jpg )"'"
-}' $URL
+(echo -n '{"data": "'; base64 $PIC; echo '", "height": 32, "width": 32}') |
+curl -H "Content-Type: application/json" -d @-  $URL

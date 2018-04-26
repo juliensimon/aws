@@ -1,14 +1,13 @@
 from chalice import Chalice
 from chalice import BadRequestError
-
 import base64, cv2
 import numpy as np
 
 app = Chalice(app_name="resizer")
-#app.debug = True
+app.debug = True
 
 @app.route('/', methods=['POST'])
-def index():  
+def index():
     body = app.current_request.json_body
 
     if 'data' not in body:
@@ -34,4 +33,4 @@ def index():
 
     print("%d %d %d %d %d " % (L, H, W, h, w))
 
-    return { 'data': data }
+    return { 'data': str(data) }
