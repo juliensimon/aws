@@ -24,8 +24,7 @@ def index():
 
     image = np.fromstring(image, np.uint8)
     image = cv2.imdecode(image, cv2.IMREAD_COLOR)
-    H = image.shape[0]
-    W = image.shape[1]
+    (H, W, _) = image.shape
     image = cv2.resize(image, (h, w,))
     image = cv2.imencode('.jpeg', image)
 
