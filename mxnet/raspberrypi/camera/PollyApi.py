@@ -1,7 +1,7 @@
 import os, boto3, pygame
 
 defaultRegion = 'eu-west-1'
-defaultUrl = 'https://polly.eu-west-1.amazonaws.com'
+defaultUrl = 'https://polly.'+defaultRegion+'.amazonaws.com'
 
 def connectToPolly(regionName=defaultRegion, endpointUrl=defaultUrl):
     return boto3.client('polly', region_name=regionName, endpoint_url=endpointUrl)
