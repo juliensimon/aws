@@ -2,5 +2,10 @@ aws s3 mb s3://jsimon-samdemo-sydney --region ap-southeast-2
 
 aws cloudformation package --template-file template.yaml --output-template-file output.yaml --s3-bucket jsimon-samdemo-sydney
 
-aws cloudformation deploy --template-file output.yaml --stack-name samdemo --region ap-southeast-2 --capabilities CAPABILITY_IAM
+aws cloudformation deploy --template-file output.yaml --stack-name samdemo --region ap-southeast-1 --capabilities CAPABILITY_IAM
 
+http put https://rrtxmjprd7.execute-api.ap-southeast-2.amazonaws.com/Prod/resource/test.doc value1=666
+
+http get https://rrtxmjprd7.execute-api.ap-southeast-2.amazonaws.com/Prod/resource/test.doc
+
+aws cloudformation delete-stack --stack-name samdemo --region ap-southeast-2
