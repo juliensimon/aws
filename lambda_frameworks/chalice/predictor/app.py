@@ -25,7 +25,7 @@ def index():
 
     print("%s %d" % (endpoint, topk))
 
-    runtime = boto3.Session().client(service_name='runtime.sagemaker', region_name='us-east-1')
+    runtime = boto3.Session().client(service_name='sagemaker-runtime', region_name='us-east-1')
     response = runtime.invoke_endpoint(EndpointName=endpoint, ContentType='application/x-image', Body=image)
     probs = response['Body'].read().decode() # byte array
 
