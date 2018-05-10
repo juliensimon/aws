@@ -1,0 +1,1 @@
+<speak> <amazon:breath duration="long" volume="x-loud"/> <prosody rate="120%"> <prosody volume="loud"> Wow! <amazon:breath duration="long" volume="loud"/> </prosody> That was quite fast <amazon:breath duration="medium" volume="x-loud"/>. I almost beat my personal best time on this track. </prosody> </speak>
