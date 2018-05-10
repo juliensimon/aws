@@ -1,5 +1,5 @@
 #export URL='http://localhost:8000'
-export URL='https://bg8phyixb4.execute-api.us-east-1.amazonaws.com/api/'
+export URL=`chalice url`
 
 export PIC='floppy.jpg'
 
