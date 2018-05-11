@@ -7,8 +7,8 @@ def main(event, context):
     sm = boto3.client('sagemaker')
     job = sm.describe_training_job(TrainingJobName=training_job_name)
 
-    training_name_prefix = os.environ['training_name_prefix']
-    training_job_name = training_job_prefix.join(str(datetime.datetime.today()).replace(' ', '-').replace(':', '-').rsplit('.')[0])
+    training_job_prefix = os.environ['training_job_prefix']
+    training_job_name = training_job_prefix+str(datetime.datetime.today()).replace(' ', '-').replace(':', '-').rsplit('.')[0]
     job['ResourceConfig']['InstanceType'] = os.environ['instance_type']
     job['ResourceConfig']['InstanceCount'] = int(os.environ['instance_count'])
 
