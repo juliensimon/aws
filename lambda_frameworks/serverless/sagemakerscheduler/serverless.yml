@@ -10,6 +10,11 @@ provider:
         - sagemaker:DescribeTrainingJob
         - sagemaker:CreateTrainingJob
       Resource: "arn:aws:sagemaker:*:*:*"
+    - Effect: "Allow"
+      Action:
+        - iam:PassRole
+      # Don't forget to update the account number and the name of the SageMaker service role
+      Resource: "arn:aws:iam::ACCOUNT_NUMBER:role/service-role/SAGEMAKER_SERVICE_ROLE"
 
 stage: dev
 region: us-east-1
@@ -18,9 +23,9 @@ functions:
   main:
     handler: handler.main
     events:
-      - schedule: rate(15 minutes)
+      - schedule: rate(5 minutes)
     environment:
       training_job_name: "DEMO-imageclassification-2018-05-10-09-58-12"
-      training_name_prefix: "imageclassification"
-      instance_type: "p3.2xlarge"
+      training_job_prefix: "imageclassification"
+      instance_type: "ml.p3.2xlarge"
       instance_count: "2"
