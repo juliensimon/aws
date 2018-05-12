@@ -1,6 +1,7 @@
 {
   "version": "2.0",
   "app_name": "sagemakertrainer",
+  "autogen_policy": false,
   "stages": {
     "dev": {
       "api_gateway_stage": "api"
