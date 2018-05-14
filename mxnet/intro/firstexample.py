@@ -70,4 +70,4 @@ val_iter = mx.io.NDArrayIter(data=X_valid,label=Y_valid, batch_size=batch)
 # Measure model accuracy
 metric = mx.metric.Accuracy()
 mod.score(val_iter, metric)
-print metric.get()
+print(metric.get())
