@@ -54,8 +54,11 @@ def printLabelsInformation(labels):
     for l in labels:
         print('Label ' + l['Name'] + ', confidence: ' + str(l['Confidence']))
 
+macFont='/Library/Fonts/Arial.ttf'
+# piFont='/usr/share/fonts/truetype/freefont/FreeSans.ttf'
+
 def drawLegendForFace(imageInfo, face, counter=0,
-        font='/Library/Fonts/Arial.ttf', fontSize=24, fill=(255,255,255,255)):
+        font=macFont, fontSize=24, fill=(255,255,255,255)):
     font = ImageFont.truetype(font, fontSize)
     image = getImage(imageInfo)
     draw = getDraw(imageInfo)
